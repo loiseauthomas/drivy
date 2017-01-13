@@ -181,7 +181,6 @@ function RentalPrice(cars, rentals){
   var j=0;
   for(i=0; i<rentals.length; i++){
     for(j=0; j<cars.length; j++){
-      console.log("cc1");
       if(rentals[i].carId==cars[j].id){
         rentals[i].price=getRentalPrice(cars[j], rentals[i]);
       }
@@ -195,13 +194,27 @@ function getRentalPrice(car, rental){
   //claculate te time of location
   var timeOfLocation=Date.parse(rental.returnDate)-Date.parse(rental.pickupDate);// Calculate the difference in milliseconds
   timeOfLocation=Math.round(timeOfLocation/(1000 * 60 * 60 * 24));//comvert the diference of time in nombre of days
-  timeOfLocation+=1;//add 1 days 
+  timeOfLocation+=1;//add 1 days -> evry day is due
+
   //calculate the price for the time and price for the distance
   var priceTime = car.pricePerDay * timeOfLocation;
+
+  //Exercise 2 - Drive more, pay less
+  if(1<timeOfLocation && timeOfLocation<=4){
+    priceTime*=0.90;//reductuion of 10% on the time location price
+  }
+  if(4<timeOfLocation && timeOfLocation<=10){
+    priceTime*=0.70;//reductuion of 30% on the time location price
+  }
+  if(10<timeOfLocation){
+    priceTime*=0.50;//reductuion of 50% on the time location price
+  }
+
   var priceDistance = car.pricePerKm * rental.distance;
+
   //calculate rental price
   rentalPrice=priceTime+priceDistance;
   return rentalPrice;
 }
-
+console.log("//Exercise 2 - Drive more, pay less");
 console.log(RentalPrice(cars, rentals));

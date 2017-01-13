@@ -176,38 +176,44 @@ var rentalModifications = [{
 
 
 //Exercise 1 - Euro-Kilometers
-function RentalPrice(cars, rentals){
+function getRental(cars, rentals){
   var i=0;
   var j=0;
   for(i=0; i<rentals.length; i++){
     for(j=0; j<cars.length; j++){
       if(rentals[i].carId==cars[j].id){
         rentals[i].price=getRentalPrice(cars[j], rentals[i]);
+        rentals[i].commission=getRentalCommition(rentals[i]);
       }
     }
   }
   return rentals;
 }
 
+function timeOfrentalCalculation(rental){
+  var timeOfrental=Date.parse(rental.returnDate)-Date.parse(rental.pickupDate);// Calculate the difference in milliseconds
+  timeOfrental=Math.round(timeOfrental/(1000 * 60 * 60 * 24));//comvert the diference of time in nombre of days
+  timeOfrental+=1;//add 1 days -> evry day is due
+  return timeOfrental
+}
+
 function getRentalPrice(car, rental){
   var rentalPrice = 0;
-  //claculate te time of location
-  var timeOfLocation=Date.parse(rental.returnDate)-Date.parse(rental.pickupDate);// Calculate the difference in milliseconds
-  timeOfLocation=Math.round(timeOfLocation/(1000 * 60 * 60 * 24));//comvert the diference of time in nombre of days
-  timeOfLocation+=1;//add 1 days -> evry day is due
+  //claculate te time of rental
+  var timeOfrental=timeOfrentalCalculation(rental);
 
   //calculate the price for the time and price for the distance
-  var priceTime = car.pricePerDay * timeOfLocation;
+  var priceTime = car.pricePerDay * timeOfrental;
 
   //Exercise 2 - Drive more, pay less
-  if(1<timeOfLocation && timeOfLocation<=4){
-    priceTime*=0.90;//reductuion of 10% on the time location price
+  if(1<timeOfrental && timeOfrental<=4){
+    priceTime*=0.90;//reductuion of 10% on the time rental price
   }
-  if(4<timeOfLocation && timeOfLocation<=10){
-    priceTime*=0.70;//reductuion of 30% on the time location price
+  if(4<timeOfrental && timeOfrental<=10){
+    priceTime*=0.70;//reductuion of 30% on the time rental price
   }
-  if(10<timeOfLocation){
-    priceTime*=0.50;//reductuion of 50% on the time location price
+  if(10<timeOfrental){
+    priceTime*=0.50;//reductuion of 50% on the time rental price
   }
 
   var priceDistance = car.pricePerKm * rental.distance;
@@ -216,5 +222,21 @@ function getRentalPrice(car, rental){
   rentalPrice=priceTime+priceDistance;
   return rentalPrice;
 }
-console.log("//Exercise 2 - Drive more, pay less");
-console.log(RentalPrice(cars, rentals));
+
+//Exercise 3 - Give me all your money
+function getRentalCommition(rental){
+  var price=rental.price;
+  var commission=Math.round(price*0.3);//Drivy take a 30% commission on the rental price to cover their costs.
+  var insurance=Math.round(commission*0.5);//insurance: half of commission
+  var assistance=1*timeOfrentalCalculation(rental);//roadside assistance 1€ per day
+  var drivy=commission-insurance-assistance;//drivy: the rest
+  rental.commission.insurance=insurance;
+  rental.commission.assistance=assistance;
+  rental.commission.drivy=drivy;
+  return rental.commission;
+}
+
+
+console.log("//Exercise 3 - Give me all your money");
+rentals=getRental(cars, rentals);
+console.log(rentals);

@@ -165,7 +165,43 @@ var rentalModifications = [{
   'pickupDate': '2015-12-05'
 }];
 
-console.log(cars);
-console.log(rentals);
-console.log(actors);
-console.log(rentalModifications);
+//console.log(cars);
+//console.log(rentals);
+//console.log(actors);
+//console.log(rentalModifications);
+
+
+
+////////////////////////////////////////EXERCISES////////////////////////////////////////////
+
+
+//Exercise 1 - Euro-Kilometers
+function RentalPrice(cars, rentals){
+  var i=0;
+  var j=0;
+  for(i=0; i<rentals.length; i++){
+    for(j=0; j<cars.length; j++){
+      console.log("cc1");
+      if(rentals[i].carId==cars[j].id){
+        rentals[i].price=getRentalPrice(cars[j], rentals[i]);
+      }
+    }
+  }
+  return rentals;
+}
+
+function getRentalPrice(car, rental){
+  var rentalPrice = 0;
+  //claculate te time of location
+  var timeOfLocation=Date.parse(rental.returnDate)-Date.parse(rental.pickupDate);// Calculate the difference in milliseconds
+  timeOfLocation=Math.round(timeOfLocation/(1000 * 60 * 60 * 24));//comvert the diference of time in nombre of days
+  timeOfLocation+=1;//add 1 days 
+  //calculate the price for the time and price for the distance
+  var priceTime = car.pricePerDay * timeOfLocation;
+  var priceDistance = car.pricePerKm * rental.distance;
+  //calculate rental price
+  rentalPrice=priceTime+priceDistance;
+  return rentalPrice;
+}
+
+console.log(RentalPrice(cars, rentals));

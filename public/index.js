@@ -184,6 +184,7 @@ function getRental(cars, rentals){
       if(rentals[i].carId==cars[j].id){
         rentals[i].price=getRentalPrice(cars[j], rentals[i]);
         rentals[i].commission=getRentalCommition(rentals[i]);
+        rentals[i]=getRentalDeductible(rentals[i]);
       }
     }
   }
@@ -236,7 +237,16 @@ function getRentalCommition(rental){
   return rental.commission;
 }
 
+//Exercice 4 - The famous deductible
+function getRentalDeductible(rental){
+  if(rental.options.deductibleReduction==true){
+    rental.price+=4;
+    rental.commission.drivy+=4;
+  }
+  return rental;
+}
 
-console.log("//Exercise 3 - Give me all your money");
+
+console.log("//Exercice 4 - The famous deductible");
 rentals=getRental(cars, rentals);
 console.log(rentals);

@@ -182,8 +182,8 @@ function getRental(cars, rentals){
   for(i=0; i<rentals.length; i++){
     for(j=0; j<cars.length; j++){
       if(rentals[i].carId==cars[j].id){
-        rentals[i].price=getRentalPrice(cars[j], rentals[i]);
-        rentals[i].commission=getRentalCommition(rentals[i]);
+        rentals[i]=getRentalPrice(cars[j], rentals[i]);
+        rentals[i]=getRentalCommition(rentals[i]);
         rentals[i]=getRentalDeductible(rentals[i]);
       }
     }
@@ -221,32 +221,56 @@ function getRentalPrice(car, rental){
 
   //calculate rental price
   rentalPrice=priceTime+priceDistance;
-  return rentalPrice;
+  rental.price=rentalPrice
+  return rental;
 }
 
 //Exercise 3 - Give me all your money
 function getRentalCommition(rental){
   var price=rental.price;
   var commission=Math.round(price*0.3);//Drivy take a 30% commission on the rental price to cover their costs.
-  var insurance=Math.round(commission*0.5);//insurance: half of commission
+  var insurance=commission*0.5;//insurance: half of commission
   var assistance=1*timeOfrentalCalculation(rental);//roadside assistance 1€ per day
   var drivy=commission-insurance-assistance;//drivy: the rest
   rental.commission.insurance=insurance;
   rental.commission.assistance=assistance;
   rental.commission.drivy=drivy;
-  return rental.commission;
+  return rental;
 }
 
 //Exercice 4 - The famous deductible
 function getRentalDeductible(rental){
   if(rental.options.deductibleReduction==true){
-    rental.price+=4;
-    rental.commission.drivy+=4;
+    var timeOfRental=timeOfrentalCalculation(rental);
+    rental.price+=4*timeOfRental;
+    rental.commission.drivy+=4*timeOfRental;
   }
   return rental;
 }
 
+//Exercise 5 - Pay the actors
+function payActors(actors, rentals){
+  var i=0;
+  var j=0;
+  for(i=0; i<rentals.length; i++){
+    for(j=0; j<actors.length; j++){
+      if(rentals[i].id==actors[j].rentalId){
+        actors[j].payment[0].amount=rentals[i].price;//payment[0].who=="driver"  the driver must pay the rental price and the (optional) deductible reduction
+        actors[j].payment[1].amount=rentals[i].price-rentals[i].commission.insurance-rentals[i].commission.assistance-rentals[i].commission.drivy;//payment[1].who=="owner"  the owner receives the rental price minus the commission
+        actors[j].payment[2].amount=rentals[i].commission.insurance;//payment[2].who=="insurance"   the insurance receives its part of the commission
+        actors[j].payment[3].amount=rentals[i].commission.assistance;//payment[3].who=="assistance"   the assistance receives its part of the commission
+        actors[j].payment[4].amount=rentals[i].commission.drivy;//payment[4].who=="drivy"   drivy receives its part of the commission, plus the deductible reduction
+      }
+    }
+  }
+  return actors;
+}
 
-console.log("//Exercice 4 - The famous deductible");
+
+
+//////////////////////////////////////////ECRITURE CONSOLE////////////////////////////////////////////////////////////
+console.log("//Exercise 5 - Pay the actors");
 rentals=getRental(cars, rentals);
 console.log(rentals);
+actors=payActors(actors,rentals);
+console.log(actors);
